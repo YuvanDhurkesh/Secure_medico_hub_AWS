@@ -1,113 +1,484 @@
-# Medicare Hub
+# Medicare Hub – Secure Multi-Tier Healthcare Management System on AWS
 
-A full-stack healthcare web application built with React, Node.js, Express, and MySQL. This application is designed to be cloud-deployment friendly, keeping the backend stateless and using environment variables for configuration.
+## Project Overview
 
-## Folder Structure
+Medicare Hub is a full-stack healthcare management application deployed using a secure multi-tier AWS cloud architecture. The application enables patient management, appointment booking, and medical report uploads while demonstrating enterprise-style cloud deployment practices.
 
+The project was designed with a production-oriented architecture using private networking, load balancing, reverse proxy configuration, managed database services, and AWS web security protection.
+
+---
+
+# Live Architecture
+
+```text
+Internet
+   ↓
+AWS WAF
+   ↓
+Application Load Balancer (ALB)
+   ↓
+Nginx Reverse Proxy
+   ├── React Frontend
+   └── Node.js Backend (PM2)
+              ↓
+        Amazon RDS MySQL
 ```
+
+---
+
+# AWS Architecture Diagram
+
+```text
+                         ┌──────────────────────────┐
+                         │        Internet          │
+                         └────────────┬─────────────┘
+                                      │
+                                      ▼
+                         ┌──────────────────────────┐
+                         │        AWS WAF           │
+                         │ SQLi / XSS Protection    │
+                         └────────────┬─────────────┘
+                                      │
+                                      ▼
+                    ┌──────────────────────────────────┐
+                    │ Application Load Balancer (ALB) │
+                    │         Public Subnets          │
+                    └────────────┬────────────────────┘
+                                 │
+                                 ▼
+              ┌──────────────────────────────────────────┐
+              │          Private EC2 Instance            │
+              │                                          │
+              │  ┌────────────────────────────────────┐  │
+              │  │               Nginx               │  │
+              │  │ Reverse Proxy + Frontend Hosting  │  │
+              │  └───────────────┬───────────────────┘  │
+              │                  │                      │
+              │      ┌───────────┴───────────┐          │
+              │      ▼                       ▼          │
+              │ React Frontend        Node.js Backend   │
+              │  (Static Build)          (PM2)          │
+              │                                         │
+              └──────────────────┬──────────────────────┘
+                                 │
+                                 ▼
+                    ┌──────────────────────────┐
+                    │      Amazon RDS          │
+                    │        MySQL DB          │
+                    │   Private Subnet Only    │
+                    └──────────────────────────┘
+
+
+               ┌─────────────────────────────────┐
+               │          Bastion Host           │
+               │      Public Subnet Access       │
+               │ SSH Entry Point to Private EC2  │
+               └─────────────────────────────────┘
+```
+
+---
+
+# Features
+
+## Application Features
+
+- Patient Registration
+- Appointment Booking
+- Medical Report Uploads
+- Patient Report Management
+- REST API Architecture
+- Responsive React Frontend
+
+---
+
+# Security Features
+
+- Private Backend EC2 Deployment
+- Private Amazon RDS Database
+- Bastion Host SSH Access
+- AWS WAF Protection
+- Security Group Isolation
+- Public/Private Subnet Separation
+- Reverse Proxy using Nginx
+- Environment Variable Configuration
+- Load Balancer Health Checks
+
+---
+
+# AWS Services Used
+
+| Service | Purpose |
+|---|---|
+| Amazon EC2 | Backend server hosting |
+| Amazon RDS MySQL | Managed database |
+| Application Load Balancer | Traffic distribution |
+| AWS WAF | Web application firewall |
+| Amazon VPC | Custom isolated networking |
+| NAT Gateway | Internet access for private subnet |
+| Internet Gateway | Public internet access |
+| Security Groups | Firewall rules |
+| Nginx | Reverse proxy & frontend hosting |
+| PM2 | Node.js process management |
+
+---
+
+# Tech Stack
+
+## Frontend
+- React.js
+- Vite
+- Axios
+- CSS
+
+## Backend
+- Node.js
+- Express.js
+- MySQL2
+- Multer
+
+## Cloud & DevOps
+- AWS EC2
+- AWS RDS
+- AWS WAF
+- AWS ALB
+- AWS VPC
+- Nginx
+- PM2
+
+---
+
+# Project Structure
+
+```text
 medico_hub/
 ├── backend/
 │   ├── config/
-│   │   └── db.js            # Database connection setup
-│   ├── controllers/         # Request handling logic
-│   ├── routes/              # Express route definitions
-│   ├── uploads/             # Locally stored medical reports
-│   ├── .env.example         # Environment variable template
+│   │   └── db.js
+│   ├── controllers/
+│   ├── routes/
+│   ├── uploads/
+│   ├── .env.example
 │   ├── package.json
-│   └── server.js            # Express server entry point
+│   └── server.js
+│
 ├── frontend/
 │   ├── src/
-│   │   ├── components/      # Reusable React components (Navbar)
-│   │   ├── pages/           # Application pages (Dashboard, Patients, etc.)
-│   │   ├── App.jsx          # Main application component & routing
-│   │   ├── index.css        # Global styles
-│   │   └── main.jsx         # React entry point
-│   ├── .env.example         # Environment variable template
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── App.jsx
+│   │   ├── main.jsx
+│   │   └── index.css
+│   ├── public/
 │   ├── package.json
-│   └── vite.config.js       # Vite configuration
-└── schema.sql               # MySQL database schema script
+│   └── vite.config.js
+│
+└── schema.sql
 ```
+
+---
+
+# Local Development Setup
 
 ## Prerequisites
 
-- Node.js (v14 or higher)
+- Node.js
 - MySQL Server
+- Git
 
-## Database Setup
+---
 
-1. Open your MySQL client (e.g., MySQL Workbench, or via command line).
-2. Execute the script located at `schema.sql` to create the `medicare_hub` database and the required tables (`patients`, `appointments`, `reports`).
+# Clone Repository
 
-## Backend Setup
+```bash
+git clone <your-github-repo-url>
+cd medico_hub
+```
 
-1. Navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Create a `.env` file in the `backend` directory based on `.env.example`:
-   ```env
-   PORT=5000
-   DB_HOST=localhost
-   DB_USER=root
-   DB_PASSWORD=your_mysql_password
-   DB_NAME=medicare_hub
-   ```
-4. Start the server:
-   ```bash
-   node server.js
-   ```
+---
 
-## Frontend Setup
+# Database Setup
 
-1. Navigate to the frontend directory:
-   ```bash
-   cd frontend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Create a `.env` file in the `frontend` directory based on `.env.example`:
-   ```env
-   VITE_API_URL=http://localhost:5000/api
-   ```
-4. Start the development server:
-   ```bash
-   npm run dev
-   ```
+Open MySQL and run:
 
-## API Documentation
+```sql
+SOURCE schema.sql;
+```
 
-### Patients API
+This creates:
+- medicare_hub database
+- patients table
+- appointments table
+- reports table
 
-- **POST `/api/patients`**
-  - Registers a new patient.
-  - Body: `{ "name": "John Doe", "age": 30, "gender": "Male", "email": "john@example.com", "phone_number": "1234567890" }`
-- **GET `/api/patients`**
-  - Retrieves a list of all registered patients.
+---
 
-### Appointments API
+# Backend Setup
 
-- **POST `/api/appointments`**
-  - Books a new appointment.
-  - Body: `{ "patient_name": "John Doe", "doctor_name": "Dr. Smith", "appointment_date": "2023-12-01", "appointment_reason": "Checkup" }`
-- **GET `/api/appointments`**
-  - Retrieves a list of all appointments.
+## Navigate to backend
 
-### Reports API
+```bash
+cd backend
+```
 
-- **POST `/api/reports/upload-report`**
-  - Uploads a medical report. Uses `multipart/form-data`.
-  - Body: `patient_name` (Text), `report` (File: PDF/JPG/PNG).
-- **GET `/api/reports`**
-  - Retrieves a list of all uploaded reports metadata.
+## Install dependencies
 
-## Cloud Deployment Readiness
+```bash
+npm install
+```
 
-- **Stateless Backend**: Sessions are not stored in memory. The frontend relies on stateless behavior (dummy authentication for now, can be extended to JWT).
-- **Environment Variables**: All sensitive info and configuration details are pulled from `.env` files.
-- **Local Storage**: Currently uses `multer` disk storage (`uploads/`). For AWS deployment, this can be swapped out with an S3 upload handler (e.g., `multer-s3`).
+## Create `.env`
+
+```env
+PORT=5000
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=your_password
+DB_NAME=medicare_hub
+```
+
+## Start backend
+
+```bash
+node server.js
+```
+
+Backend runs on:
+
+```text
+http://localhost:5000
+```
+
+---
+
+# Frontend Setup
+
+## Navigate to frontend
+
+```bash
+cd frontend
+```
+
+## Install dependencies
+
+```bash
+npm install
+```
+
+## Create `.env`
+
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+## Start frontend
+
+```bash
+npm run dev
+```
+
+Frontend runs on:
+
+```text
+http://localhost:5173
+```
+
+---
+
+# Production Deployment Architecture
+
+## Frontend Deployment
+
+The React frontend was built using:
+
+```bash
+npm run build
+```
+
+The generated static files were hosted using Nginx:
+
+```text
+/usr/share/nginx/html
+```
+
+Nginx serves:
+- HTML
+- CSS
+- JavaScript bundles
+
+---
+
+# Backend Deployment
+
+The Node.js backend was deployed on a private EC2 instance using PM2:
+
+```bash
+pm2 start server.js --name server
+```
+
+PM2 provides:
+- Process management
+- Auto restart
+- Background execution
+- Crash recovery
+
+---
+
+# Nginx Reverse Proxy Configuration
+
+Nginx handles:
+- Frontend hosting
+- API reverse proxying
+
+Example flow:
+
+```text
+/api/*  → Node.js backend
+/       → React frontend
+```
+
+---
+
+# Networking Architecture
+
+## Public Subnet
+Contains:
+- Application Load Balancer
+- Bastion Host
+- NAT Gateway
+
+## Private Subnet
+Contains:
+- Backend EC2
+- Amazon RDS
+
+---
+
+# Security Architecture
+
+## Bastion Host
+Used for secure SSH access into private EC2 instances.
+
+## Private Backend
+Backend EC2 instance does not have a public IP.
+
+## Private Database
+Amazon RDS configured with:
+- Public Access = No
+
+## AWS WAF
+Configured with managed security rules for:
+- SQL Injection protection
+- Malicious payload inspection
+- Rate limiting
+
+---
+
+# API Endpoints
+
+## Patients API
+
+### Register Patient
+
+```http
+POST /api/patients
+```
+
+### Get Patients
+
+```http
+GET /api/patients
+```
+
+---
+
+## Appointments API
+
+### Book Appointment
+
+```http
+POST /api/appointments
+```
+
+### Get Appointments
+
+```http
+GET /api/appointments
+```
+
+---
+
+## Reports API
+
+### Upload Report
+
+```http
+POST /api/reports/upload-report
+```
+
+### Get Reports
+
+```http
+GET /api/reports
+```
+
+---
+
+# Health Check Endpoint
+
+```http
+GET /health
+```
+
+Response:
+
+```json
+{
+  "status": "healthy"
+}
+```
+
+---
+
+# Deployment Highlights
+
+- Multi-tier AWS Architecture
+- Secure Private Networking
+- Production-grade Reverse Proxy Setup
+- Managed Database Deployment
+- Web Security with AWS WAF
+- Load Balanced Traffic Routing
+- Cloud-ready Stateless Backend Design
+
+---
+
+# Screenshots
+
+Attached
+
+---
+
+# Demo Video
+
+(Add YouTube demo link here)
+
+---
+
+# Future Improvements
+
+- JWT Authentication
+- HTTPS using ACM + Route53
+- Docker Containerization
+- CI/CD using GitHub Actions
+- Amazon S3 Report Storage
+- Auto Scaling Groups
+- Monitoring using CloudWatch
+
+---
+
+# Author
+
+Yuvan Dhurkesh SJ
+
+BTech CSE Undergraduate  
+Cloud & DevOps Enthusiast  
+AWS Certified Learner
