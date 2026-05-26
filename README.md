@@ -190,7 +190,7 @@ medico_hub/
 # Clone Repository
 
 ```bash
-git clone <your-github-repo-url>
+git clone https://github.com/YuvanDhurkesh/Secure_medico_hub_AWS.git
 cd medico_hub
 ```
 
