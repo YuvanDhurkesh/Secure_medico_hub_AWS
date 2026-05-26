@@ -481,4 +481,4 @@ Yuvan Dhurkesh SJ
 
 BTech CSE Undergraduate  
 Cloud & DevOps Enthusiast  
-AWS Certified Learner
+AWS Certified SAA | DVA | CLF
